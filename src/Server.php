@@ -64,10 +64,9 @@ class Server
             'enable_coroutine' => false // must be set on false for Runtime::enableCoroutine
         ]);
 
-        $callbacks = config('server.callbacks');
-        foreach ($callbacks as $event => $callback) {
-            $this->server->on($event, [$callback[0], $callback[1]]);
-        }
+        $this->registerCallbacks(
+            config('server.callbacks')
+        );
 
         if ($watcher) {
             (new Process(function (Process $process) {
@@ -180,5 +179,12 @@ class Server
     public function getServer(): SwooleServer
     {
         return $this->server;
+    }
+
+    private function registerCallbacks(array $callbacks): void
+    {
+        foreach ($callbacks as $event => $callback) {
+            $this->server->on($event, [...$callback]);
+        }
     }
 }
